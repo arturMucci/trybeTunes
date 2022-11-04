@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { getUser } from '../services/userAPI';
+import '../styles/Header.css';
 
 class Header extends React.Component {
   constructor() {
@@ -29,7 +30,6 @@ class Header extends React.Component {
       <header
         data-testid="header-component"
       >
-        <p data-testid="header-user-name">{isLoading ? userName : 'Carregando...'}</p>
         <nav>
           <ul>
             <li>
@@ -43,6 +43,7 @@ class Header extends React.Component {
             </li>
           </ul>
         </nav>
+        <p data-testid="header-user-name">{isLoading ? userName : 'Carregando...'}</p>
       </header>
     );
   }
