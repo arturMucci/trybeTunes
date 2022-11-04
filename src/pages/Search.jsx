@@ -47,7 +47,6 @@ class Search extends React.Component {
     return (
       <div data-testid="page-search">
         <Header />
-        <h1>Search</h1>
         {isLoading
           ? 'Carregando'
           : (
