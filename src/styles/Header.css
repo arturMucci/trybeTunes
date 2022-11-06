@@ -1,8 +1,8 @@
 header {
-  display: flex;
-  justify-content: space-between;
-  height: fit-content;
   background-color: green;
+  display: flex;
+  height: fit-content;
+  justify-content: space-between;
 }
 
 header p {

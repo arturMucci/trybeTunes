@@ -4,15 +4,16 @@ import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
 import { addSong } from '../services/favoriteSongsAPI';
-
+// , getFavoriteSongs
 class Album extends React.Component {
   constructor() {
     super();
     this.state = {
+      isLoading: false,
       thisAlbum: '',
       thisAlbumMusics: [],
       favoriteSongs: [],
-      isLoading: false,
+      whosChecked: [],
     };
   }
 
@@ -22,29 +23,35 @@ class Album extends React.Component {
     const mockMusics = await getMusics(albumId);
     const albumMusics = [...mockMusics];
     const albumInformation = albumMusics.shift();
+    const test = albumMusics.map(() => false);
+
     this.setState({
       thisAlbum: albumInformation,
       thisAlbumMusics: albumMusics,
+      whosChecked: [...test],
     });
   }
 
-  onCheck = ({ target }, trackName) => {
-    const { favoriteSongs } = this.state;
+  onCheck = async ({ target }) => {
+    const { thisAlbumMusics, whosChecked } = this.state;
     if (target.checked) {
-      this.setState((prev) => ({
-        isLoading: true,
-        favoriteSongs: [...prev.favoriteSongs, trackName],
-      }), async () => {
-        await addSong(favoriteSongs);
-        this.setState({
-          isLoading: false,
-        });
+      this.setState({ isLoading: true });
+      const music = thisAlbumMusics.find((each) => each.trackId === Number(target.id));
+      await addSong(music);
+      thisAlbumMusics.forEach((each, index) => {
+        if (each.trackId === Number(target.id)) {
+          whosChecked[index] = true;
+        }
       });
+      this.setState((prev) => ({
+        isLoading: false,
+        favoriteSongs: [...prev.favoriteSongs, music],
+      }));
     }
   };
 
   render() {
-    const { thisAlbum, thisAlbumMusics, isLoading, favoriteSongs } = this.state;
+    const { thisAlbum, thisAlbumMusics, isLoading, whosChecked } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
@@ -66,14 +73,13 @@ class Album extends React.Component {
               </div>
               <div>
                 {thisAlbumMusics
-                  .map((music) => (<MusicCard
+                  .map((music, index) => (<MusicCard
                     key={ music.trackId }
                     music={ music }
-                    checked={ favoriteSongs.includes(music.trackName) }
+                    checked={ whosChecked[index] }
                     onCheck={ this.onCheck }
                   />))}
               </div>
-
             </>
           )}
       </div>

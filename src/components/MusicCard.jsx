@@ -3,23 +3,23 @@ import PropTypes from 'prop-types';
 
 class MusicCard extends React.Component {
   render() {
-    const { music: { trackName, trackId, previewUrl }, onCheck, checked } = this.props;
+    const { music, onCheck, checked } = this.props;
     return (
       <div>
-        <p>{trackName}</p>
+        <p>{music.trackName}</p>
         <div>
-          <label htmlFor={ `checkbox-music-${trackId}` }>
+          <label htmlFor={ music.trackId }>
             <input
               type="checkbox"
-              data-testid={ `checkbox-music-${trackId}` }
-              id={ `checkbox-music-${trackId}` }
+              data-testid={ `checkbox-music-${music.trackId}` }
+              id={ music.trackId }
               checked={ checked }
-              onChange={ (evnt) => onCheck(evnt, trackName) }
+              onChange={ (evnt) => onCheck(evnt, music) }
             />
             Favorita
           </label>
         </div>
-        <audio data-testid="audio-component" src={ previewUrl } controls>
+        <audio data-testid="audio-component" src={ music.previewUrl } controls>
           <track kind="captions" />
           O seu navegador não suporta o elemento
           {' '}
