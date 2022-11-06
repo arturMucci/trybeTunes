@@ -3,11 +3,23 @@ import PropTypes from 'prop-types';
 
 class MusicCard extends React.Component {
   render() {
-    const { music } = this.props;
+    const { music: { trackName, trackId, previewUrl }, onCheck, checked } = this.props;
     return (
       <div>
-        <p>{music.trackName}</p>
-        <audio data-testid="audio-component" src={ music.previewUrl } controls>
+        <p>{trackName}</p>
+        <div>
+          <label htmlFor={ `checkbox-music-${trackId}` }>
+            <input
+              type="checkbox"
+              data-testid={ `checkbox-music-${trackId}` }
+              id={ `checkbox-music-${trackId}` }
+              checked={ checked }
+              onChange={ (evnt) => onCheck(evnt, trackName) }
+            />
+            Favorita
+          </label>
+        </div>
+        <audio data-testid="audio-component" src={ previewUrl } controls>
           <track kind="captions" />
           O seu navegador não suporta o elemento
           {' '}
@@ -22,6 +34,8 @@ class MusicCard extends React.Component {
 
 MusicCard.propTypes = {
   music: PropTypes.shape().isRequired,
+  onCheck: PropTypes.func.isRequired,
+  checked: PropTypes.bool.isRequired,
 };
 
 export default MusicCard;
