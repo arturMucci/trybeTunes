@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
-import { addSong } from '../services/favoriteSongsAPI';
-// , getFavoriteSongs
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
+
 class Album extends React.Component {
   constructor() {
     super();
@@ -23,30 +23,54 @@ class Album extends React.Component {
     const mockMusics = await getMusics(albumId);
     const albumMusics = [...mockMusics];
     const albumInformation = albumMusics.shift();
-    const test = albumMusics.map(() => false);
-
+    const favoriteSongs = await getFavoriteSongs();
+    const whosChecked = albumMusics
+      .map((music) => favoriteSongs.some(({ trackId }) => trackId === music.trackId));
     this.setState({
       thisAlbum: albumInformation,
       thisAlbumMusics: albumMusics,
-      whosChecked: [...test],
+      favoriteSongs,
+      whosChecked,
     });
   }
+
+  saveFavorite = async (target, thisAlbumMusics, whosChecked) => {
+    this.setState({ isLoading: true });
+    const music = thisAlbumMusics.find((each) => each.trackId === Number(target.id));
+    await addSong(music);
+    thisAlbumMusics.forEach((each, index) => {
+      if (each.trackId === Number(target.id)) {
+        whosChecked[index] = true;
+      }
+    });
+    this.setState((prev) => ({
+      isLoading: false,
+      favoriteSongs: [...prev.favoriteSongs, music],
+    }));
+  };
+
+  removeSong = async (target, thisAlbumMusics, whosChecked) => {
+    this.setState({ isLoading: true });
+    const music = thisAlbumMusics.find((each) => each.trackId === Number(target.id));
+    await removeSong(music);
+    thisAlbumMusics.forEach((each, index) => {
+      if (each.trackId === Number(target.id)) {
+        whosChecked[index] = false;
+      }
+    });
+    this.setState((prev) => ({
+      isLoading: false,
+      favoriteSongs: [...prev.favoriteSongs, music],
+    }));
+  };
 
   onCheck = async ({ target }) => {
     const { thisAlbumMusics, whosChecked } = this.state;
     if (target.checked) {
-      this.setState({ isLoading: true });
-      const music = thisAlbumMusics.find((each) => each.trackId === Number(target.id));
-      await addSong(music);
-      thisAlbumMusics.forEach((each, index) => {
-        if (each.trackId === Number(target.id)) {
-          whosChecked[index] = true;
-        }
-      });
-      this.setState((prev) => ({
-        isLoading: false,
-        favoriteSongs: [...prev.favoriteSongs, music],
-      }));
+      await this.saveFavorite(target, thisAlbumMusics, whosChecked);
+    }
+    if (!target.checked) {
+      await this.removeSong(target, thisAlbumMusics, whosChecked);
     }
   };
 
