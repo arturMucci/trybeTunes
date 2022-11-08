@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { createUser } from '../services/userAPI';
 
 const three = 3;
-const Delay = 1000;
 
 class Login extends React.Component {
   constructor() {
@@ -15,9 +14,6 @@ class Login extends React.Component {
     };
   }
 
-  componentWillUnmount() {
-  }
-
   checkNameInputLength = ({ target }) => {
     this.setState({
       isLoginButtonDisabled: target.value.length < three,
@@ -25,14 +21,12 @@ class Login extends React.Component {
     });
   };
 
-  handleUserName = () => {
+  handleUserName = async () => {
     this.setState({ isLoading: false });
     const { userName } = this.state;
     const { history } = this.props;
-    createUser({ name: userName });
-    setTimeout(() => {
-      history.push('/search');
-    }, Delay);
+    await createUser({ name: userName });
+    history.push('/search');
   };
 
   render() {
